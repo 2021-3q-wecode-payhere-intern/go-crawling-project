@@ -14,20 +14,20 @@ func main() {
 
 	// MongoDB instance
 	mongoDB := db.MongoDBConfig{
-		config.MongoDBHost,
-		config.MongoDBPort,
-		config.MongoDBName,
-		config.MongoDBUserName,
-		config.MongoDBPassword,
+		MongoDBHost:     config.MongoDBHost,
+		MongoDBPort:     config.MongoDBPort,
+		MongoDBName:     config.MongoDBName,
+		MongoDBUserName: config.MongoDBUserName,
+		MongoDBPassword: config.MongoDBPassword,
 	}
 
 	//Codef instance
 	codeF := codef.CodefConfig{
-		config.CodefPublicKey,
-		config.CodefClientId,
-		config.CodefClientSecret,
-		config.CrefiaId,
-		config.CrefiaPassword,
+		CodefPublicKey:    config.CodefPublicKey,
+		CodefClientId:     config.CodefClientId,
+		CodefClientSecret: config.CodefClientSecret,
+		CrefiaId:          config.CrefiaId,
+		CrefiaPassword:    config.CrefiaPassword,
 	}
 
 	// db커넥션
