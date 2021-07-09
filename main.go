@@ -2,25 +2,47 @@ package main
 
 import (
 	"codef"
+	"config"
 	"context"
 	"db"
 	"log"
 )
 
 func main() {
+	// init config
+	config := config.InitConfig()
+
+	// MongoDB instance
+	mongoDB := db.MongoDBConfig{
+		config.MongoDBHost,
+		config.MongoDBPort,
+		config.MongoDBName,
+		config.MongoDBUserName,
+		config.MongoDBPassword,
+	}
+
+	//Codef instance
+	codeF := codef.CodefConfig{
+		config.CodefPublicKey,
+		config.CodefClientId,
+		config.CodefClientSecret,
+		config.CrefiaId,
+		config.CrefiaPassword,
+	}
+
 	// db커넥션
-	client, err := db.ConnectDB()
+	mongoDBClient, err := mongoDB.ConnectDB()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	collection := client.Collection("testStore")
+	mongoDBCollection := mongoDBClient.Collection("testStore")
 
-	codefResult := codef.GetDepositInfos("20210501", "20210505")
+	codefResult := codeF.GetDepositInfos("20210501", "20210505")
 
 	for _, tempMap := range codefResult {
 		value := struct {
-			DommEndDate          string
+			CommEndDate          string
 			CommMemberStoreGroup string
 			CommStartDate        string
 			ResAccountIn         string
@@ -49,12 +71,12 @@ func main() {
 			tempMap["resSuspenseAmount"],
 		}
 
-		_, err := collection.InsertOne(context.Background(), value)
+		_, err := mongoDBCollection.InsertOne(context.Background(), value)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
 
 	// db 커넥션 종료
-	client.Client().Disconnect(context.TODO())
+	mongoDBClient.Client().Disconnect(context.TODO())
 }

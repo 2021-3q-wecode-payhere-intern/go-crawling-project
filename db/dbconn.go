@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"key"
 	"log"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -10,22 +9,23 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-func ConnectDB() (*mongo.Database, error) {
-	databaseMap := key.GetDatabaseKeyValue()
+type MongoDBConfig struct {
+	MongoDBHost     string
+	MongoDBPort     string
+	MongoDBName     string
+	MongoDBUserName string
+	MongoDBPassword string
+}
 
-	ip := databaseMap["ip"]
-	port := databaseMap["port"]
-	dbName := databaseMap["dbName"]
-	id := databaseMap["id"]
-	password := databaseMap["password"]
-	dbURI := "mongodb://" + ip + ":" + port
+func (config MongoDBConfig) ConnectDB() (*mongo.Database, error) {
+	MongoDBUrl := "mongodb://" + config.MongoDBHost + ":" + config.MongoDBPort
 
 	credential := options.Credential{
-		Username: id,
-		Password: password,
+		Username: config.MongoDBUserName,
+		Password: config.MongoDBPassword,
 	}
 
-	clientOptions := options.Client().ApplyURI(dbURI).SetAuth(credential)
+	clientOptions := options.Client().ApplyURI(MongoDBUrl).SetAuth(credential)
 
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
@@ -37,7 +37,7 @@ func ConnectDB() (*mongo.Database, error) {
 		log.Fatal(err)
 	}
 
-	database := client.Database(dbName)
+	database := client.Database(config.MongoDBName)
 
 	return database, err
 }
